@@ -15,6 +15,15 @@ class HotdogDataModule(pl.LightningDataModule):
         image_size: int = 224,
         normalize_mean: tuple = (0.485, 0.456, 0.406),
         normalize_std: tuple = (0.229, 0.224, 0.225),
+        pin_memory: bool = True,
+        persistent_workers: bool = True,
+        # Data augmentation parameters
+        random_flip_p: float = 0.5,
+        random_rotation_degrees: float = 15,
+        color_jitter_brightness: float = 0.2,
+        color_jitter_contrast: float = 0.2,
+        color_jitter_saturation: float = 0.2,
+        color_jitter_hue: float = 0.1,
     ):
         super().__init__()
         self.data_dir = data_dir
@@ -24,13 +33,28 @@ class HotdogDataModule(pl.LightningDataModule):
         self.image_size = image_size
         self.normalize_mean = normalize_mean
         self.normalize_std = normalize_std
+        self.pin_memory = pin_memory
+        self.persistent_workers = persistent_workers
+        # Store augmentation parameters
+        self.random_flip_p = random_flip_p
+        self.random_rotation_degrees = random_rotation_degrees
+        self.color_jitter_brightness = color_jitter_brightness
+        self.color_jitter_contrast = color_jitter_contrast
+        self.color_jitter_saturation = color_jitter_saturation
+        self.color_jitter_hue = color_jitter_hue
+        self.save_hyperparameters()
         
         # Define transforms
         self.train_transform = transforms.Compose([
             transforms.Resize((self.image_size, self.image_size)),
-            transforms.RandomHorizontalFlip(p=0.5),
-            transforms.RandomRotation(degrees=15),
-            transforms.ColorJitter(brightness=0.2, contrast=0.2, saturation=0.2, hue=0.1),
+            transforms.RandomHorizontalFlip(p=self.random_flip_p),
+            transforms.RandomRotation(degrees=self.random_rotation_degrees),
+            transforms.ColorJitter(
+                brightness=self.color_jitter_brightness, 
+                contrast=self.color_jitter_contrast, 
+                saturation=self.color_jitter_saturation, 
+                hue=self.color_jitter_hue
+            ),
             transforms.ToTensor(),
             transforms.Normalize(mean=self.normalize_mean, std=self.normalize_std)
         ])
@@ -95,8 +119,8 @@ class HotdogDataModule(pl.LightningDataModule):
             batch_size=self.batch_size,
             shuffle=True,
             num_workers=self.num_workers,
-            pin_memory=True,
-            persistent_workers=True if self.num_workers > 0 else False
+            pin_memory=self.pin_memory,
+            persistent_workers=self.persistent_workers if self.num_workers > 0 else False
         )
 
     def val_dataloader(self):
@@ -106,8 +130,8 @@ class HotdogDataModule(pl.LightningDataModule):
             batch_size=self.batch_size,
             shuffle=False,
             num_workers=self.num_workers,
-            pin_memory=True,
-            persistent_workers=True if self.num_workers > 0 else False
+            pin_memory=self.pin_memory,
+            persistent_workers=self.persistent_workers if self.num_workers > 0 else False
         )
 
     def test_dataloader(self):
@@ -117,8 +141,8 @@ class HotdogDataModule(pl.LightningDataModule):
             batch_size=self.batch_size,
             shuffle=False,
             num_workers=self.num_workers,
-            pin_memory=True,
-            persistent_workers=True if self.num_workers > 0 else False
+            pin_memory=self.pin_memory,
+            persistent_workers=self.persistent_workers if self.num_workers > 0 else False
         )
 
     def predict_dataloader(self):

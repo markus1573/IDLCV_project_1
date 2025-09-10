@@ -16,11 +16,13 @@ class ResNet18Hotdog(nn.Module):
 
 
 class HotdogClassifier(pl.LightningModule):
-    def __init__(self, model, lr=0.001):
+    def __init__(self, model, lr=0.001, weight_decay=0.01):
         super().__init__()
         self.model = model
         self.criterion = nn.CrossEntropyLoss()  # Changed from BCEWithLogitsLoss
         self.lr = lr
+        self.weight_decay = weight_decay
+        self.save_hyperparameters(ignore=['model'])
 
     def forward(self, x):
         return self.model(x)
@@ -59,7 +61,7 @@ class HotdogClassifier(pl.LightningModule):
         return {'test_loss': loss, 'test_acc': acc}
 
     def configure_optimizers(self):
-        return torch.optim.Adam(self.model.parameters(), lr=self.lr)
+        return torch.optim.AdamW(self.model.parameters(), lr=self.lr, weight_decay=self.weight_decay)
 
 
 if __name__ == "__main__":

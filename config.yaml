@@ -1,0 +1,63 @@
+# Hotdog/Not-Hotdog Classification Config
+
+# Reproducibility
+seed: 42
+
+# Model Configuration
+model:
+  backbone: "resnet18"
+  pretrained: true
+  num_classes: 2
+  lr: 0.0001
+  weight_decay: 0.01
+  optimizer: "adamw"
+
+# Data Configuration
+data:
+  data_dir: "hotdog_nothotdog"
+  batch_size: 64
+  num_workers: 4
+  val_split: 0.2
+  image_size: 224
+  normalize_mean: [0.485, 0.456, 0.406]  # ImageNet normalization
+  normalize_std: [0.229, 0.224, 0.225]   # ImageNet normalization
+  pin_memory: true
+  persistent_workers: true
+
+# Data Augmentation (Training Only)
+augmentation:
+  random_horizontal_flip:
+    p: 0.5
+  random_rotation:
+    degrees: 15
+  color_jitter:
+    brightness: 0.2
+    contrast: 0.2
+    saturation: 0.2
+    hue: 0.1
+
+# Training Configuration
+training:
+  max_epochs: 20
+  accelerator: "auto"
+  devices: "auto"
+  log_every_n_steps: 10
+  val_check_interval: 1.0
+  enable_progress_bar: true
+  enable_model_summary: true
+
+# Callbacks Configuration
+callbacks:
+  model_checkpoint:
+    monitor: "val_loss"
+    mode: "min"
+    save_top_k: 1
+    save_last: true
+    filename: "hotdog-{epoch:02d}-{val_acc:.3f}"
+    verbose: true
+  
+  early_stopping:
+    monitor: "val_loss"
+    mode: "min"
+    patience: 10
+    verbose: true
