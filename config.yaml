@@ -12,7 +12,7 @@ model:
 # Data Configuration
 data:
   data_dir: "hotdog_nothotdog"
-  batch_size: 128
+  batch_size: 64
   num_workers: 8
   val_split: 0.2
   image_size: 224
@@ -23,7 +23,7 @@ data:
 
 # Data Augmentation (Training Only)
 augmentation:
-  enabled: true  # Set to false to disable all training augmentation
+  enabled: false  # Set to false to disable all training augmentation
   random_horizontal_flip:
     p: 0.5
   random_rotation:
@@ -36,7 +36,7 @@ augmentation:
 
 # Training Configuration
 training:
-  max_epochs: 20
+  max_epochs: 30
   accelerator: "auto"
   devices: "auto"
   log_every_n_steps: 10
@@ -47,15 +47,15 @@ training:
 # Callbacks Configuration
 callbacks:
   model_checkpoint:
-    monitor: "val_loss"
-    mode: "min"
+    monitor: "val_acc"
+    mode: "max"
     save_top_k: 1
     save_last: true
     filename: "hotdog-{epoch:02d}-{val_acc:.3f}"
     verbose: true
   
   early_stopping:
-    monitor: "val_loss"
-    mode: "min"
+    monitor: "val_acc"
+    mode: "max"
     patience: 10
     verbose: true
