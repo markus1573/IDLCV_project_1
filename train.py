@@ -56,7 +56,7 @@ def main(config_path: str = "config.yaml"):
     print()
     
     # Initialize model
-    backbone = ResNet18Hotdog()
+    backbone = ResNet18Hotdog(config['model']['pretrained'])
     model = HotdogClassifier(
         model=backbone, 
         lr=config['model']['lr'], 

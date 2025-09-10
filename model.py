@@ -5,9 +5,9 @@ import torch
 
 
 class ResNet18Hotdog(nn.Module):
-    def __init__(self):
+    def __init__(self, pretrained=True):
         super().__init__()
-        self.model = models.resnet18(pretrained=True)
+        self.model = models.resnet18(pretrained=pretrained)
         self.model.fc = nn.Linear(self.model.fc.in_features, 2)
 
     def forward(self, x):
@@ -65,7 +65,7 @@ class HotdogClassifier(pl.LightningModule):
 
 
 if __name__ == "__main__":
-    model = ResNet18Hotdog()
+    model = ResNet18Hotdog(pretrained=True)
     hotdog_module = HotdogClassifier(model)
     print(hotdog_module)
 
