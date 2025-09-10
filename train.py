@@ -40,6 +40,7 @@ def main(config_path: str = "config.yaml"):
         pin_memory=config['data']['pin_memory'],
         persistent_workers=config['data']['persistent_workers'],
         # Data augmentation parameters
+        augmentation_enabled=config['augmentation']['enabled'],
         random_flip_p=config['augmentation']['random_horizontal_flip']['p'],
         random_rotation_degrees=config['augmentation']['random_rotation']['degrees'],
         color_jitter_brightness=config['augmentation']['color_jitter']['brightness'],

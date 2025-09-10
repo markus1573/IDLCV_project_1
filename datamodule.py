@@ -18,6 +18,7 @@ class HotdogDataModule(pl.LightningDataModule):
         pin_memory: bool = True,
         persistent_workers: bool = True,
         # Data augmentation parameters
+        augmentation_enabled: bool = True,
         random_flip_p: float = 0.5,
         random_rotation_degrees: float = 15,
         color_jitter_brightness: float = 0.2,
@@ -36,6 +37,7 @@ class HotdogDataModule(pl.LightningDataModule):
         self.pin_memory = pin_memory
         self.persistent_workers = persistent_workers
         # Store augmentation parameters
+        self.augmentation_enabled = augmentation_enabled
         self.random_flip_p = random_flip_p
         self.random_rotation_degrees = random_rotation_degrees
         self.color_jitter_brightness = color_jitter_brightness
@@ -45,20 +47,30 @@ class HotdogDataModule(pl.LightningDataModule):
         self.save_hyperparameters()
         
         # Define transforms
-        self.train_transform = transforms.Compose([
-            transforms.Resize((self.image_size, self.image_size)),
-            transforms.RandomHorizontalFlip(p=self.random_flip_p),
-            transforms.RandomRotation(degrees=self.random_rotation_degrees),
-            transforms.ColorJitter(
-                brightness=self.color_jitter_brightness, 
-                contrast=self.color_jitter_contrast, 
-                saturation=self.color_jitter_saturation, 
-                hue=self.color_jitter_hue
-            ),
-            transforms.ToTensor(),
-            transforms.Normalize(mean=self.normalize_mean, std=self.normalize_std)
-        ])
+        if self.augmentation_enabled:
+            # Training transform with augmentation
+            self.train_transform = transforms.Compose([
+                transforms.Resize((self.image_size, self.image_size)),
+                transforms.RandomHorizontalFlip(p=self.random_flip_p),
+                transforms.RandomRotation(degrees=self.random_rotation_degrees),
+                transforms.ColorJitter(
+                    brightness=self.color_jitter_brightness, 
+                    contrast=self.color_jitter_contrast, 
+                    saturation=self.color_jitter_saturation, 
+                    hue=self.color_jitter_hue
+                ),
+                transforms.ToTensor(),
+                transforms.Normalize(mean=self.normalize_mean, std=self.normalize_std)
+            ])
+        else:
+            # Training transform without augmentation (same as val/test)
+            self.train_transform = transforms.Compose([
+                transforms.Resize((self.image_size, self.image_size)),
+                transforms.ToTensor(),
+                transforms.Normalize(mean=self.normalize_mean, std=self.normalize_std)
+            ])
         
+        # Validation and test transform (always without augmentation)
         self.val_test_transform = transforms.Compose([
             transforms.Resize((self.image_size, self.image_size)),
             transforms.ToTensor(),

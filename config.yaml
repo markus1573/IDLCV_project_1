@@ -5,18 +5,15 @@ seed: 42
 
 # Model Configuration
 model:
-  backbone: "resnet18"
-  pretrained: true
-  num_classes: 2
+  pretrained: false
   lr: 0.0001
   weight_decay: 0.01
-  optimizer: "adamw"
 
 # Data Configuration
 data:
   data_dir: "hotdog_nothotdog"
-  batch_size: 64
-  num_workers: 4
+  batch_size: 128
+  num_workers: 8
   val_split: 0.2
   image_size: 224
   normalize_mean: [0.485, 0.456, 0.406]  # ImageNet normalization
@@ -26,6 +23,7 @@ data:
 
 # Data Augmentation (Training Only)
 augmentation:
+  enabled: true  # Set to false to disable all training augmentation
   random_horizontal_flip:
     p: 0.5
   random_rotation:
