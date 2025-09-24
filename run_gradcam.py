@@ -1,7 +1,3 @@
-"""
-Simple script to run Grad-CAM visualization on test images
-"""
-
 import os
 import glob
 import random
